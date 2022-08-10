@@ -23,7 +23,20 @@ Install dependencies
   npm install
 ```
 
-Start the server
+Install Python Virtual Environment
+
+```bash
+pip3 install virtualenv
+virtualenv env
+source env/bin/activate
+```
+
+Start the backend server
+
+```bash
+python3 app.py
+```
+Start the client server
 
 ```bash
   npx parcel index.html
