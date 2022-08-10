@@ -6,76 +6,45 @@ class Swapi extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      urls: [],
+      people: [],
       planetUrls: [],
       planets: [],
       planetsData: [],
       filter: ''
     };
  
-    this.peopleUrl = 'https://swapi.dev/api/people'
-    this.planetsUrl = 'https://swapi.dev/api/planets'
-    this.fetchpeople = this.fetchpeople.bind(this)
+    this.planetsUrl = '/api/planets'
+    this.allPeopleUrl = '/api/all'
     this.fetchplanets = this.fetchplanets.bind(this)
     this.filterByPlanet = this.filterByPlanet.bind(this)
+    this.fetchall = this.fetchall.bind(this)
   }
   
-   fetchpeople = async () => {
-    let result;
-    let fullResult = []
-    let done = false
-    let url = this.peopleUrl
-    while (!done) {
-      result = await fetch(url)
-      result = await result.json()
-      fullResult.push(result.results)
-      if (result['next'] ) {
-            url = result.next
-      } else {
-            done = true
-      }
-    }
-    fullResult = fullResult.flat()
-    return fullResult
+  fetchall = async () => {
+    let url = this.allPeopleUrl
+    let result = await fetch(url)
+    result = await result.json()
+    return result
   }
-
+  
   fetchplanets = async () => {
-    let result;
-    let fullResult = []
-    let done = false
     let url = this.planetsUrl
-    while (!done) {
-      result = await fetch(url)
-      result = await result.json()
-      fullResult.push(result.results)
-      if (result['next'] ) {
-            url = result.next
-      } else {
-            done = true
-      }
-    }
-    fullResult = fullResult.flat()
-    return fullResult
+    let result = await fetch(url)
+    result = await result.json()
+    return result
   }
 
   filterByPlanet = async (e) => {
-    const people = this.state.urls.filter(el => el['homeworld'] == e.target.value)
+    const people = this.state.people.filter(el => el['homeworld'] == e.target.value)
     this.setState({planetUrls: people, filter: e.target.value})
   }
 
   componentDidMount = async () => {
 
-    const data = await this.fetchpeople()
+    let data = await this.fetchall()
     const planets = await this.fetchplanets()
-    for (let person of data) {
-      for (let planet of planets) {
-        if (person['homeworld'] == planet['url']) {
-          person['homeworld'] = planet['name']
-          continue
-        }
-      }
-    }
-    this.setState({urls: data, planetUrls: data})
+   
+    this.setState({people: data, planetUrls: data})
     this.setState({planetsData: planets})
 
     const planetsArray = []
