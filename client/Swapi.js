@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 
-// Feed contains multiple FeedItems
-// Put AJAX in this Component
+
 class Swapi extends Component {
 
   constructor(props) {
@@ -10,16 +9,18 @@ class Swapi extends Component {
       urls: [],
       planetUrls: [],
       planets: [],
-      planetsData: []
+      planetsData: [],
+      filter: ''
     };
-    this.peopleUrl = this.props.peopleUrl;
-    this.planetsUrl = this.props.planetsUrl;
-    this.fetchdata = this.fetchdata.bind(this)
+ 
+    this.peopleUrl = 'https://swapi.dev/api/people'
+    this.planetsUrl = 'https://swapi.dev/api/planets'
+    this.fetchpeople = this.fetchpeople.bind(this)
     this.fetchplanets = this.fetchplanets.bind(this)
-    this.handleInputChange = this.handleInputChange.bind(this)
+    this.filterByPlanet = this.filterByPlanet.bind(this)
   }
   
-   fetchdata = async () => {
+   fetchpeople = async () => {
     let result;
     let fullResult = []
     let done = false
@@ -57,14 +58,14 @@ class Swapi extends Component {
     return fullResult
   }
 
-  handleInputChange = async (e) => {
+  filterByPlanet = async (e) => {
     const people = this.state.urls.filter(el => el['homeworld'] == e.target.value)
-    this.setState({planetUrls: people})
+    this.setState({planetUrls: people, filter: e.target.value})
   }
 
   componentDidMount = async () => {
 
-    const data = await this.fetchdata()
+    const data = await this.fetchpeople()
     const planets = await this.fetchplanets()
     for (let person of data) {
       for (let planet of planets) {
@@ -86,9 +87,9 @@ class Swapi extends Component {
 
   render() {
     const characters = [];
-    this.state.planetUrls.forEach((rec) => {
-      const pname = rec['name']
-      const homeworld = rec['homeworld']
+    this.state.planetUrls.forEach((person) => {
+      const pname = person['name']
+      const homeworld = person['homeworld']
       characters.push(<tr><td>{pname}</td><td>{homeworld}</td></tr> )
     })
     const planets = []
@@ -100,20 +101,20 @@ class Swapi extends Component {
       <div id='feed'>
         <div >
           <label className='inputLabels'>Filter by Homeworld</label>
-              <select className='inputText' type='select' name='homeworld' value={'hello'} onChange={(e) => {this.handleInputChange(e)}} >
-                <option>Select planet</option>
-              {planets}
+              <select className='inputText' type='select' style={styles.select} onChange={(e) => {this.filterByPlanet(e)}} >
+                <option>{this.state.filter}</option>
+                {planets}
               </select>
         </div>
-        <div  style={styles.container}>
-        <table className='table' >
-          <thead >
+        <div>
+        <table>
+          <thead>
             <tr>
-              <td>Name</td>
-              <td>Homeworld</td>
+              <td style={styles.thead}>Name</td>
+              <td style={styles.thead}>Homeworld</td>
             </tr>            
           </thead>
-          <tbody >
+          <tbody style={styles.tbody}>
             {characters}
           </tbody>
         </table>
@@ -124,23 +125,17 @@ class Swapi extends Component {
 
 }
 const styles = {
-  container: {
-    display: 'grid',
-    gridGap: '10px',
-    gridTemplateColumns: '1fr 1fr',
-    gridTemplateRows: 'auto',
-    gridTemplateAreas: 
-    `'header header'
-    'body body'`,
-    gap: '2px 2px',
-    justifyContent: 'center',
-    border: '2px',
-    borderStyle: 'solid'
-  }, 
-  inner: {
-    border: '1px',
-    borderStyle: 'solid',
-    minHeight: '15px'
+  thead: {
+    backgroundColor: 'lavender',
+    width: '200px',
+    color: 'black'
+  },
+  select: {
+    margin: '10px'
+  },
+  tbody: {
+    backgroundColor: 'white',
+    color: 'black'
   }
 };
 
